@@ -9,5 +9,6 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("search/", views.title, name="title"),
     path("search/<str:requestedTitle>", views.reqTitle, name="reqTitle"),
-    path("createPage", views.createPage, name="createPage")
+    path("createPage", views.createPage, name="createPage"),
+    path("editPage", views.editPage, name="editPage")
 ]

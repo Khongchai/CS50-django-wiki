@@ -5,5 +5,21 @@
 {% endblock %}
 
 {% block body %}
-    {{ entry }}
+    <form action="{% url 'encyclopedia:editPage' %}" method="POST">
+        <textarea name="entryField" class="textAreaDisplay" readonly=readonly id="content">
+            {{ entry }}
+        </textarea>
+        {% csrf_token %}
+        <input type="submit" value="Edit" class="btn btn-primary" style="margin-top: 20px">
+    </form>
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        var text = document.getElementById('content');
+        text.style.height = text.scrollHeight+'px';
+    })
+
+</script>
 {% endblock %}

@@ -58,6 +58,12 @@ def createPage(request):
         "form": AddNewEntryForm()
     })
 
+def editPage(request):
+    if request.method == "POST":
+        markup = request.POST.get('entryField')
+        print(markup)
+    return render(request, "encyclopedia/editPage.html")
+
 
 
 
