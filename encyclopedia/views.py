@@ -5,6 +5,7 @@ from django import forms
 from django.urls import reverse
 from django.http import HttpResponse
 from django.shortcuts import redirect
+import re
 
 
 class AddNewEntryForm(forms.Form):
@@ -59,10 +60,42 @@ def createPage(request):
     })
 
 def editPage(request):
-    if request.method == "POST":
-        markup = request.POST.get('entryField')
-        print(markup)
-    return render(request, "encyclopedia/editPage.html")
+    #change submit = get, editing = post
+        if request.method == "GET":
+            submittedChange = AddNewEntryForm(request.GET)
+            if (submittedChange.is_valid()):
+                formTitles = submittedChange.cleaned_data["formTitle"]
+                formDescription = submittedChange.cleaned_data["formDescription"]
+
+                titles = re.findall(r"[\w]+", formTitles)
+                title = titles[0]
+
+                
+
+                return (HttpResponseRedirect(reverse("encyclopedia:reqTitle", args=[title])))
+
+            else:
+                return HttpResponseRedirect("Error")
+        else:
+            markup = re.split(r"[\r\n]+", (request.POST.get('entryField')))
+            
+            #right now it does not work with HTML page, find a way to do that
+            markupHeaders = [char for char in markup if "#" in char]
+            markupDescriptions = [char for char in markup if "#" not in char]
+
+            #first member of markupHeaders is the name of the fil
+
+            #in case there are more than 1 headings
+            forms = []
+            for i in range(len(markupHeaders)):
+                forms.append(AddNewEntryForm(initial={'formTitle': markupHeaders[i], 'formDescription': markupDescriptions[i]}))
+                
+            
+            return render(request, "encyclopedia/editPage.html", {
+                "forms": forms
+            })
+            
+    
 
 
 

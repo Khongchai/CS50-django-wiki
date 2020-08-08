@@ -1,6 +1,13 @@
 {% extends "encyclopedia/layout.html" %}
 
 {% block body %}
-    
+    <form action="{% url 'encyclopedia:editPage' %}" method="GET">
+        {% for form in forms %}
+            {{ form }}
+        {% endfor %}
+        {% csrf_token %}
+
+        <input type="submit" value="Submit Change" class="btn btn-primary" style="margin-top: 20px">
+    </form> 
 {% endblock %}
 
