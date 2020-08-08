@@ -5,19 +5,40 @@
 {% endblock %}
 
 {% block body %}
-    <form action="{% url 'encyclopedia:editPage' %}" method="POST">
-        <textarea name="entryField" class="textAreaDisplay" readonly=readonly id="content">{{ entry }}</textarea>
+    <form action="{% url 'encyclopedia:editPage' %}" method="POST" id="main_form">
+        <textarea name="entryField" class="textAreaDisplay" readOnly="true" id="content">{{ entry }}</textarea>
         {% csrf_token %}
-        <input type="submit" value="Edit" class="btn btn-primary" style="margin-top: 20px">
     </form>
+        <button id="EditButton" class="btn btn-primary" onclick="changereadOnly()">Edit</button>
+        
 {% endblock %}
 
 {% block script %}
 <script>
+    editButton = document.getElementById("EditButton");
+    textArea = document.getElementById("content");
     document.addEventListener("DOMContentLoaded", () => {
         var text = document.getElementById('content');
         text.style.height = text.scrollHeight+'px';
     })
+    
+    function changereadOnly()
+    {
+        if (editButton.innerHTML === "Edit")
+        {
+            editButton.innerHTML = "Save";
+            textArea.readOnly = false;
+        }
+        else
+        {
+            document.getElementById("main_form").submit();
+            editButton.innerHTML = "Edit";
+            textArea.readOnly = true;
+
+        }
+       
+    }
+
 
 </script>
 {% endblock %}

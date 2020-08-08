@@ -60,6 +60,12 @@ def createPage(request):
     })
 
 def editPage(request):
+    if request.method == "POST":
+        #call save entry and then reload the same page
+        return HttpResponse("Place Holder");
+
+
+    """
     #change submit = get, editing = post
         if request.method == "GET":
             submittedChange = AddNewEntryForm(request.GET)
@@ -96,7 +102,7 @@ def editPage(request):
             })
             
     
-
+"""
 
 
 
