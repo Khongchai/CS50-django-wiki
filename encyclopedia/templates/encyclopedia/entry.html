@@ -6,10 +6,11 @@
 
 {% block body %}
     <form action="{% url 'encyclopedia:editPage' %}" method="POST" id="main_form">
-        <textarea name="entryField" class="textAreaDisplay" readOnly="true" id="content">{{ entry }}</textarea>
+        {{ entry }}
         {% csrf_token %}
     </form>
         <button id="EditButton" class="btn btn-primary" onclick="changereadOnly()">Edit</button>
+
         
 {% endblock %}
 
@@ -32,9 +33,6 @@
         else
         {
             document.getElementById("main_form").submit();
-            editButton.innerHTML = "Edit";
-            textArea.readOnly = true;
-
         }
        
     }

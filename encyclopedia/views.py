@@ -14,6 +14,10 @@ class AddNewEntryForm(forms.Form):
     formDescription = forms.CharField(label="", 
     widget=forms.Textarea(attrs={'placeholder': 'Enter description', 'class': 'mediumMargin textAreaSize'}))
 
+class TextAreaOnly(forms.Form):
+    description = forms.CharField(label="", 
+    widget=forms.Textarea(attrs={'class': 'mediumMargin textAreaSize', 'id': 'content'}))
+
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -31,8 +35,10 @@ def reqTitle(request, requestedTitle):
     tobeDisplayed = util.get_entry(requestedTitle)
     if tobeDisplayed is None:
         tobeDisplayed = "Error: the requested page could not be found"
+
     return render(request, "encyclopedia/entry.html", {
-        "entry": tobeDisplayed
+        "entry": TextAreaOnly(initial={"description": tobeDisplayed})
+        #"entry": tobeDisplayed
     })
 
 def createPage(request):
@@ -61,9 +67,15 @@ def createPage(request):
 
 def editPage(request):
     if request.method == "POST":
-        #call save entry and then reload the same page
-        return HttpResponse("Place Holder");
+        #try changing here to clean data
+        #then if that's ok, and you know that no whitte spaces are added, then you're good to just style everything nicely
+        formContentNew = request.POST.get('entryField')
+        tmp = re.findall(r"[\w]+", formContentNew)
+        #title name will be the first that gets detected
+        formTitle = tmp[0]
+        util.save_entry(formTitle, formContentNew)
 
+        return HttpResponseRedirect(reverse("encyclopedia:reqTitle", args=[formTitle])) 
 
     """
     #change submit = get, editing = post
