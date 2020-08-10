@@ -6,7 +6,8 @@
 
 {% block body %}
     <form action="{% url 'encyclopedia:editPage' %}" method="POST" id="main_form">
-        {{ entry }}
+        {{ entry|safe }}
+
         {% csrf_token %}
     </form>
         <button id="EditButton" class="btn btn-primary" onclick="changereadOnly()">Edit</button>
@@ -20,6 +21,7 @@
     textArea = document.getElementById("content");
     document.addEventListener("DOMContentLoaded", () => {
         var text = document.getElementById('content');
+        text.readOnly = true;
         text.style.height = text.scrollHeight+'px';
     })
     

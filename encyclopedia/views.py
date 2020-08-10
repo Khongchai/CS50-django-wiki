@@ -6,6 +6,8 @@ from django.urls import reverse
 from django.http import HttpResponse
 from django.shortcuts import redirect
 import re
+import random
+from markdown2 import Markdown
 
 
 class AddNewEntryForm(forms.Form):
@@ -16,7 +18,7 @@ class AddNewEntryForm(forms.Form):
 
 class TextAreaOnly(forms.Form):
     description = forms.CharField(label="", 
-    widget=forms.Textarea(attrs={'class': 'mediumMargin textAreaSize', 'id': 'content'}))
+    widget=forms.Textarea(attrs={'class': 'textAreaDisplay', 'id': 'content'}))
 
 
 def index(request):
@@ -35,7 +37,8 @@ def reqTitle(request, requestedTitle):
     tobeDisplayed = util.get_entry(requestedTitle)
     if tobeDisplayed is None:
         tobeDisplayed = "Error: the requested page could not be found"
-
+    markdownRead = Markdown()
+    tobeDisplayed = markdownRead.convert(tobeDisplayed)
     return render(request, "encyclopedia/entry.html", {
         "entry": TextAreaOnly(initial={"description": tobeDisplayed})
         #"entry": tobeDisplayed
@@ -67,54 +70,28 @@ def createPage(request):
 
 def editPage(request):
     if request.method == "POST":
-        #try changing here to clean data
-        #then if that's ok, and you know that no whitte spaces are added, then you're good to just style everything nicely
-        formContentNew = request.POST.get('entryField')
-        tmp = re.findall(r"[\w]+", formContentNew)
-        #title name will be the first that gets detected
-        formTitle = tmp[0]
-        util.save_entry(formTitle, formContentNew)
+        formContentAll = TextAreaOnly(request.POST)
+        if formContentAll.is_valid():
+            formContentNew = formContentAll.cleaned_data["description"]
 
-        return HttpResponseRedirect(reverse("encyclopedia:reqTitle", args=[formTitle])) 
+            #get all words and form title and first member is always title
+            tmp = re.findall(r"[\w]+", formContentNew)
+            formTitle = tmp[0]
 
-    """
-    #change submit = get, editing = post
-        if request.method == "GET":
-            submittedChange = AddNewEntryForm(request.GET)
-            if (submittedChange.is_valid()):
-                formTitles = submittedChange.cleaned_data["formTitle"]
-                formDescription = submittedChange.cleaned_data["formDescription"]
+            util.save_entry(formTitle, formContentNew)
+            return HttpResponseRedirect(reverse("encyclopedia:reqTitle", args=[formTitle])) 
 
-                titles = re.findall(r"[\w]+", formTitles)
-                title = titles[0]
+    return HttpResponse("Page load failure: code 13902")
 
-                
-
-                return (HttpResponseRedirect(reverse("encyclopedia:reqTitle", args=[title])))
-
-            else:
-                return HttpResponseRedirect("Error")
-        else:
-            markup = re.split(r"[\r\n]+", (request.POST.get('entryField')))
-            
-            #right now it does not work with HTML page, find a way to do that
-            markupHeaders = [char for char in markup if "#" in char]
-            markupDescriptions = [char for char in markup if "#" not in char]
-
-            #first member of markupHeaders is the name of the fil
-
-            #in case there are more than 1 headings
-            forms = []
-            for i in range(len(markupHeaders)):
-                forms.append(AddNewEntryForm(initial={'formTitle': markupHeaders[i], 'formDescription': markupDescriptions[i]}))
-                
-            
-            return render(request, "encyclopedia/editPage.html", {
-                "forms": forms
-            })
-            
+def randomize(request):
+    allEntries = util.list_entries()
+    entriesAmount = len(allEntries)
     
-"""
+    randomNum = random.randint(0, entriesAmount - 1)
+    print(randomNum)
+
+    #add link to random page
+    return HttpResponseRedirect(reverse("encyclopedia:reqTitle", args=[allEntries[randomNum]]))
 
 
 

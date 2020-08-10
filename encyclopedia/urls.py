@@ -10,5 +10,6 @@ urlpatterns = [
     path("search/", views.title, name="title"),
     path("search/<str:requestedTitle>", views.reqTitle, name="reqTitle"),
     path("createPage", views.createPage, name="createPage"),
-    path("editPage", views.editPage, name="editPage")
+    path("editPage", views.editPage, name="editPage"),
+    path("randomize", views.randomize, name="randomize")
 ]
